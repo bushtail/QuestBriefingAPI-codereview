@@ -9,6 +9,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{0AB3BF05
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuestBriefingAPI.Tests", "tests\QuestBriefingAPI.Tests.csproj", "{4127273D-5C0C-4091-A69E-4749E31462EC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuestBriefingAPIExample", "QuestBriefingAPIExample\QuestBriefingAPIExample.csproj", "{680E5712-F5C4-470B-91BC-92DCCCA999F8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,6 +45,18 @@ Global
 		{4127273D-5C0C-4091-A69E-4749E31462EC}.Release|x64.Build.0 = Release|Any CPU
 		{4127273D-5C0C-4091-A69E-4749E31462EC}.Release|x86.ActiveCfg = Release|Any CPU
 		{4127273D-5C0C-4091-A69E-4749E31462EC}.Release|x86.Build.0 = Release|Any CPU
+		{680E5712-F5C4-470B-91BC-92DCCCA999F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{680E5712-F5C4-470B-91BC-92DCCCA999F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{680E5712-F5C4-470B-91BC-92DCCCA999F8}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{680E5712-F5C4-470B-91BC-92DCCCA999F8}.Debug|x64.Build.0 = Debug|Any CPU
+		{680E5712-F5C4-470B-91BC-92DCCCA999F8}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{680E5712-F5C4-470B-91BC-92DCCCA999F8}.Debug|x86.Build.0 = Debug|Any CPU
+		{680E5712-F5C4-470B-91BC-92DCCCA999F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{680E5712-F5C4-470B-91BC-92DCCCA999F8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{680E5712-F5C4-470B-91BC-92DCCCA999F8}.Release|x64.ActiveCfg = Release|Any CPU
+		{680E5712-F5C4-470B-91BC-92DCCCA999F8}.Release|x64.Build.0 = Release|Any CPU
+		{680E5712-F5C4-470B-91BC-92DCCCA999F8}.Release|x86.ActiveCfg = Release|Any CPU
+		{680E5712-F5C4-470B-91BC-92DCCCA999F8}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
