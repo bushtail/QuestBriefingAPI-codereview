@@ -15,7 +15,7 @@ public class Plugin : BaseUnityPlugin
 
         BriefingApi.Register(
             "questbriefingexample",
-            "657315df034d76585f032e01",
+            "0123456789abcdef01234567",
             assembly, 
             "qbe.ogg",
             null,

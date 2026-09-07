@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
-  "packId": "yourname.myquests",
+  "packId": "yourname.questbriefingexample",
   "radioFilter": false,
   "radioCues": false,
   "briefings": [
     {
       "questId": "0123456789abcdef01234567",
-      "file": "audio/first-assignment.ogg"
+      "file": "audio/example.ogg"
     }
   ]
 }
