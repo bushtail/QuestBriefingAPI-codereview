@@ -15,9 +15,9 @@ public class Plugin : BaseUnityPlugin
 
         BriefingApi.Register(
             "questbriefingexample",
-            "0123456789abcdef01234567",
+            "657315df034d76585f032e01", // Shooting Cans
             assembly, 
-            "example.ogg",
+            "example.mp3",
             null,
             null
         );

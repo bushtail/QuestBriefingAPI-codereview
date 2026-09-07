@@ -5,8 +5,8 @@
   "radioCues": false,
   "briefings": [
     {
-      "questId": "0123456789abcdef01234567",
-      "file": "audio/example.ogg"
+      "questId": "657315df034d76585f032e01",
+      "file": "audio/example.mp3"
     }
   ]
 }

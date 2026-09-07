@@ -8,50 +8,55 @@ namespace Manimal.QuestBriefingAPI;
 internal sealed class StrictTextReader(TextReader reader) : JsonTextReader(reader)
 {
     private readonly Stack<HashSet<string>> _objects = new();
-    
+
     public override bool Read()
     {
-        if (!base.Read())
+        while (base.Read())
         {
-            return false;
-        }
-
-        switch (TokenType)
-        {
-            case JsonToken.StartObject:
+            if (TokenType == JsonToken.Comment)
             {
-                _objects.Push(new HashSet<string>(StringComparer.Ordinal));
-                break;
+                continue;
             }
             
-            case JsonToken.EndObject:
+            switch (TokenType)
             {
-                if (_objects.Count > 0)
+                case JsonToken.StartObject:
                 {
-                    _objects.Pop();
+                    _objects.Push(new HashSet<string>(StringComparer.Ordinal));
+                    break;
                 }
+            
+                case JsonToken.EndObject:
+                {
+                    if (_objects.Count > 0)
+                    {
+                        _objects.Pop();
+                    }
 
-                break;
+                    break;
+                }
+            
+                case JsonToken.PropertyName:
+                {
+                    if (_objects.Count == 0)
+                    {
+                        throw new JsonReaderException($"Property '{Value}' encountered outside an object.");
+                    }
+
+                    var name = (string)Value;
+
+                    if (!_objects.Peek().Add(name))
+                    {
+                        throw new JsonReaderException($"Duplicate JSON property '{name}'.");
+                    }
+
+                    break;
+                }
             }
             
-            case JsonToken.PropertyName:
-            {
-                if (_objects.Count == 0)
-                {
-                    throw new JsonReaderException($"Property {Value} encountered outside an object.");
-                }
-
-                var name = (string)Value;
-
-                if (!_objects.Peek().Add(name))
-                {
-                    throw new JsonReaderException($"Duplicate JSON property '{name}'.");
-                }
-
-                break;
-            }
+            return true;
         }
 
-        return true;
+        return false;
     }
 }

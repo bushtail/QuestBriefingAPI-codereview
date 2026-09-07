@@ -25,9 +25,6 @@
     <ItemGroup>
       <ProjectReference Include="..\QuestBriefingAPIClient\QuestBriefingAPIClient.csproj" />
     </ItemGroup>
-    <ItemGroup>
-      <Folder Include="Resources\" />
-    </ItemGroup>
     <Target Name="CheckGameReferences" BeforeTargets="ResolveReferences">
         <Error Condition="!Exists('$(SPTPath)/EscapeFromTarkov_Data/Managed/Assembly-CSharp.dll')"
                Text="Pass -p:SPTPath=PATH to your SPT 4.1 installation, or set SPT_PATH." />
