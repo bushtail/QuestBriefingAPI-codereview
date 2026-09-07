@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "packId": "yourname.questbriefingexample",
+  "radioFilter": false,
+  "radioCues": false,
+  "briefings": [
+    {
+      "questId": "657315df034d76585f032e01",
+      "file": "audio/example.mp3"
+    }
+  ]
+}

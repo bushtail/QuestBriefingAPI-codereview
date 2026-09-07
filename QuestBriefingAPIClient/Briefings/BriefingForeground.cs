@@ -5,34 +5,40 @@ using EFT.UI;
 using HarmonyLib;
 using UnityEngine;
 
-namespace Manimal.QuestBriefingAPI
+namespace Manimal.QuestBriefingAPI.Briefings;
+
+internal static class BriefingForeground
 {
-    internal static class BriefingForeground
+    private static readonly FieldInfo InputChildren = AccessTools.Field(typeof(ItemUiContext), "_children");
+
+    internal static void Validate()
     {
-        // ItemUiContext registers open windows in its input children, including
-        // the DelayTypeWindow used for quest completion and queued quest messages.
-        private static readonly FieldInfo InputChildren = AccessTools.Field(typeof(ItemUiContext), "_children");
-
-        internal static void Validate()
+        if (InputChildren == null)
         {
-            if (InputChildren == null)
-                throw new MissingFieldException("ItemUiContext input window list was not found.");
+            throw new MissingFieldException("ItemUiContext input window list was not found.");
         }
+    }
 
-        internal static bool HasForegroundWindow()
+    internal static bool HasForegroundWindow()
+    {
+        var context = ItemUiContext.Instance;
+        if (!context) { return false; }
+        
+        if (InputChildren?.GetValue(context) is not IList children) { return true; }
+        
+        foreach (var childObject in children)
         {
-            var context = ItemUiContext.Instance;
-            if (context == null) return false;
-            if (!(InputChildren?.GetValue(context) is IList children)) return true;
-            for (int i = 0; i < children.Count; i++)
+            var child = childObject as Component;
+            if (!child || !child.gameObject.activeInHierarchy) { continue; }
+            
+            for (var type = child.GetType(); type != null; type = type.BaseType)
             {
-                var child = children[i] as Component;
-                if (child == null || !child.gameObject.activeInHierarchy) continue;
-                for (Type type = child.GetType(); type != null; type = type.BaseType)
-                    if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Window<>))
-                        return true;
+                if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Window<>))
+                {
+                    return true;
+                }
             }
-            return false;
         }
+        return false;
     }
 }

@@ -1,17 +1,24 @@
-namespace Manimal.QuestBriefingAPI
+namespace Manimal.QuestBriefingAPI.Briefings;
+
+public sealed class BriefingFocusGate
 {
-    // Allow UI callbacks/queued message windows to settle before starting audio.
-    public sealed class BriefingFocusGate
+    private double _visibleSince = double.NaN;
+
+    public bool Update(bool foreground, double now)
     {
-        private double _visibleSince = double.NaN;
-
-        public bool Update(bool foreground, double now)
+        if (!foreground)
         {
-            if (!foreground) { Reset(); return false; }
-            if (double.IsNaN(_visibleSince)) _visibleSince = now;
-            return now - _visibleSince >= 0.15;
+            Reset(); 
+            return false;
         }
-
-        public void Reset() => _visibleSince = double.NaN;
+        
+        if (double.IsNaN(_visibleSince))
+        {
+            _visibleSince = now;
+        }
+        
+        return now - _visibleSince >= 0.15;
     }
+
+    public void Reset() => _visibleSince = double.NaN;
 }

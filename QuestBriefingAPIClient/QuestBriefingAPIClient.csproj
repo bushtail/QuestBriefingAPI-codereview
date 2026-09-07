@@ -8,7 +8,7 @@
     <NoWarn>$(NoWarn);1591</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="QuestBriefingAPIClient/**/*.cs" />
+    <Compile Include="./**/*.cs" />
     <Reference Include="BepInEx;0Harmony">
       <HintPath>$(SPTPath)/BepInEx/core/%(Identity).dll</HintPath>
       <Private>false</Private>
