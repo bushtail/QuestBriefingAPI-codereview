@@ -83,10 +83,10 @@ namespace Manimal.QuestBriefingAPI
         {
             try
             {
-                if ((System.IO.File.GetAttributes(directory) & FileAttributes.ReparsePoint) != 0) return;
+                if ((File.GetAttributes(directory) & FileAttributes.ReparsePoint) != 0) return;
                 var manifest = Path.Combine(directory, "briefings.json");
-                if (System.IO.File.Exists(manifest)) manifests.Add(manifest);
-                foreach (var child in System.IO.Directory.GetDirectories(directory)) Discover(child, manifests);
+                if (File.Exists(manifest)) manifests.Add(manifest);
+                foreach (var child in Directory.GetDirectories(directory)) Discover(child, manifests);
             }
             catch (Exception ex) { Warning($"[Briefings] Cannot scan '{directory}': {ex.Message}"); }
         }
@@ -98,7 +98,7 @@ namespace Manimal.QuestBriefingAPI
                 var directory = Path.GetDirectoryName(Path.GetFullPath(manifest));
                 SafePath(directory, Path.GetFileName(manifest), false);
                 // Catch duplicate JSON keys and misspelled settings rather than silently ignoring them.
-                var json = JObject.Parse(System.IO.File.ReadAllText(manifest), new JsonLoadSettings
+                var json = JObject.Parse(File.ReadAllText(manifest), new JsonLoadSettings
                 { DuplicatePropertyNameHandling = DuplicatePropertyNameHandling.Error });
                 var pack = json.ToObject<Pack>(JsonSerializer.Create(new JsonSerializerSettings
                 { MissingMemberHandling = MissingMemberHandling.Error }));
@@ -161,8 +161,8 @@ namespace Manimal.QuestBriefingAPI
             if (audio && extension != "" && extension != ".wav" && extension != ".ogg" && extension != ".mp3")
                 throw new ArgumentException("Only WAV, OGG, MP3 or extensionless audio paths are supported.");
             for (var cursor = path; cursor != null; cursor = Path.GetDirectoryName(cursor))
-                if ((System.IO.File.Exists(cursor) || System.IO.Directory.Exists(cursor))
-                    && (System.IO.File.GetAttributes(cursor) & FileAttributes.ReparsePoint) != 0)
+                if ((File.Exists(cursor) || Directory.Exists(cursor))
+                    && (File.GetAttributes(cursor) & FileAttributes.ReparsePoint) != 0)
                     throw new ArgumentException("Symbolic links and junctions are not supported in recording paths.");
             return path;
         }
