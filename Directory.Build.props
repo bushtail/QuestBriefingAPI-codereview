@@ -1,0 +1,6 @@
+<Project>
+  <PropertyGroup>
+    <!-- Keep this repository independent of any parent Directory.Build.props. -->
+    <SPTPath Condition="'$(SPTPath)' == ''">$(SPT_PATH)</SPTPath>
+  </PropertyGroup>
+</Project>

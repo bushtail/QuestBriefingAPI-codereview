@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>QuestBriefingAPI</AssemblyName>
+    <RootNamespace>Manimal.QuestBriefingAPI</RootNamespace>
+    <Version>1.0.0</Version>
+    <Authors>Manimal</Authors>
+    <LangVersion>latest</LangVersion>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="QuestBriefingAPIClient/**/*.cs" />
+    <Reference Include="BepInEx;0Harmony">
+      <HintPath>$(SPTPath)/BepInEx/core/%(Identity).dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="spt-common;spt-reflection">
+      <HintPath>$(SPTPath)/BepInEx/plugins/spt/%(Identity).dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Assembly-CSharp;Sirenix.Serialization;Comfort;Comfort.Unity;Newtonsoft.Json;Unity.TextMeshPro;UnityEngine;UnityEngine.CoreModule;UnityEngine.AudioModule;UnityEngine.UI;UnityEngine.UIModule;UnityEngine.UnityWebRequestModule;UnityEngine.UnityWebRequestAudioModule;UnityEngine.InputLegacyModule;UnityEngine.TextRenderingModule">
+      <HintPath>$(SPTPath)/EscapeFromTarkov_Data/Managed/%(Identity).dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+  <Target Name="CheckGameReferences" BeforeTargets="ResolveReferences">
+    <Error Condition="!Exists('$(SPTPath)/EscapeFromTarkov_Data/Managed/Assembly-CSharp.dll')"
+           Text="Pass -p:SPTPath=PATH to your SPT 4.1 installation, or set SPT_PATH." />
+  </Target>
+</Project>
