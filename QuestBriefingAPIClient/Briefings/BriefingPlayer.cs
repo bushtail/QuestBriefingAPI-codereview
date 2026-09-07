@@ -16,9 +16,9 @@ namespace Manimal.QuestBriefingAPI
     public sealed class BriefingPlayer : MonoBehaviour
     {
         private static BriefingPlayer _active;
-        private readonly BriefingSelection _selection = new BriefingSelection();
-        private readonly BriefingFocusGate _focus = new BriefingFocusGate();
-        private readonly List<CanvasGroup> _canvasGroups = new List<CanvasGroup>();
+        private readonly BriefingSelection _selection = new();
+        private readonly BriefingFocusGate _focus = new();
+        private readonly List<CanvasGroup> _canvasGroups = new();
         private bool _paused;
         private TMP_Text _description;
         private RectTransform _bar;

@@ -13,7 +13,7 @@ namespace Manimal.QuestBriefingAPI
 
         internal string ResolvePath()
         {
-            // Revalidate at playback so replacing a directory with a link cannot escape the pack.
+            // Revalidate at playback, so replacing a directory with a link cannot escape the pack.
             var path = BriefingRegistry.SafePath(Directory, File);
             if (Path.HasExtension(path)) return System.IO.File.Exists(path) ? path : null;
             foreach (var extension in new[] { ".wav", ".ogg", ".mp3" })
@@ -27,9 +27,8 @@ namespace Manimal.QuestBriefingAPI
 
     internal sealed class BriefingRegistry
     {
-        private readonly Dictionary<string, BriefingRecording> _recordings =
-            new Dictionary<string, BriefingRecording>(StringComparer.OrdinalIgnoreCase);
-        private readonly HashSet<string> _packs = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, BriefingRecording> _recordings = new(StringComparer.OrdinalIgnoreCase);
+        private readonly HashSet<string> _packs = new(StringComparer.OrdinalIgnoreCase);
         internal Action<string> Warning = _ => { };
         internal int Count => _recordings.Count;
 

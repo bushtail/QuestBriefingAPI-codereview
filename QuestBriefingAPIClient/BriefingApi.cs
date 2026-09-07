@@ -3,7 +3,7 @@ namespace Manimal.QuestBriefingAPI
     /// <summary>Register local quest recordings. Call from your plugin's Awake on the Unity main thread.</summary>
     public static class BriefingApi
     {
-        internal static readonly BriefingRegistry Registry = new BriefingRegistry();
+        internal static readonly BriefingRegistry Registry = new();
 
         /// <summary>Registers one recording. An existing quest registration wins; inspect the return value.</summary>
         /// <param name="ownerId">Unique mod/pack identifier, used in diagnostics and unregister calls.</param>
