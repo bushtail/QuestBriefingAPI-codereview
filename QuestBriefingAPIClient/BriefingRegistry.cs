@@ -14,11 +14,11 @@ namespace Manimal.QuestBriefingAPI
         internal string ResolvePath()
         {
             // Revalidate at playback so replacing a directory with a link cannot escape the pack.
-            string path = BriefingRegistry.SafePath(Directory, File);
+            var path = BriefingRegistry.SafePath(Directory, File);
             if (Path.HasExtension(path)) return System.IO.File.Exists(path) ? path : null;
-            foreach (string extension in new[] { ".wav", ".ogg", ".mp3" })
+            foreach (var extension in new[] { ".wav", ".ogg", ".mp3" })
             {
-                string candidate = BriefingRegistry.SafePath(Directory, File + extension);
+                var candidate = BriefingRegistry.SafePath(Directory, File + extension);
                 if (System.IO.File.Exists(candidate)) return candidate;
             }
             return null;
@@ -74,8 +74,8 @@ namespace Manimal.QuestBriefingAPI
             var manifests = new List<string>();
             Discover(pluginsDirectory, manifests);
             manifests.Sort(StringComparer.Ordinal);
-            int loaded = 0;
-            foreach (string manifest in manifests)
+            var loaded = 0;
+            foreach (var manifest in manifests)
                 if (LoadPack(manifest)) loaded++;
             return loaded;
         }
@@ -85,9 +85,9 @@ namespace Manimal.QuestBriefingAPI
             try
             {
                 if ((System.IO.File.GetAttributes(directory) & FileAttributes.ReparsePoint) != 0) return;
-                string manifest = Path.Combine(directory, "briefings.json");
+                var manifest = Path.Combine(directory, "briefings.json");
                 if (System.IO.File.Exists(manifest)) manifests.Add(manifest);
-                foreach (string child in System.IO.Directory.GetDirectories(directory)) Discover(child, manifests);
+                foreach (var child in System.IO.Directory.GetDirectories(directory)) Discover(child, manifests);
             }
             catch (Exception ex) { Warning($"[Briefings] Cannot scan '{directory}': {ex.Message}"); }
         }
@@ -96,7 +96,7 @@ namespace Manimal.QuestBriefingAPI
         {
             try
             {
-                string directory = Path.GetDirectoryName(Path.GetFullPath(manifest));
+                var directory = Path.GetDirectoryName(Path.GetFullPath(manifest));
                 SafePath(directory, Path.GetFileName(manifest), false);
                 // Catch duplicate JSON keys and misspelled settings rather than silently ignoring them.
                 var json = JObject.Parse(System.IO.File.ReadAllText(manifest), new JsonLoadSettings
@@ -140,7 +140,7 @@ namespace Manimal.QuestBriefingAPI
         private static bool IsId(string id)
         {
             if (id == null || id.Length != 24) return false;
-            foreach (char c in id) if (!Uri.IsHexDigit(c)) return false;
+            foreach (var c in id) if (!Uri.IsHexDigit(c)) return false;
             return true;
         }
 
@@ -151,17 +151,17 @@ namespace Manimal.QuestBriefingAPI
                 throw new ArgumentException("An absolute local directory is required.");
             if (string.IsNullOrWhiteSpace(file) || Path.IsPathRooted(file) || file.IndexOf(':') >= 0)
                 throw new ArgumentException("file must be a relative local path.");
-            foreach (string part in file.Replace('\\', '/').Split('/'))
+            foreach (var part in file.Replace('\\', '/').Split('/'))
                 if (part == ".." || part == "." || part.Length == 0 || part.EndsWith(" ") || part.EndsWith("."))
                     throw new ArgumentException("file contains an unsafe path segment.");
-            string root = Path.GetFullPath(directory).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
-                + Path.DirectorySeparatorChar;
-            string path = Path.GetFullPath(Path.Combine(root, file));
+            var root = Path.GetFullPath(directory).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
+                       + Path.DirectorySeparatorChar;
+            var path = Path.GetFullPath(Path.Combine(root, file));
             if (!path.StartsWith(root, StringComparison.OrdinalIgnoreCase)) throw new ArgumentException("file escapes its pack directory.");
-            string extension = Path.GetExtension(path).ToLowerInvariant();
+            var extension = Path.GetExtension(path).ToLowerInvariant();
             if (audio && extension != "" && extension != ".wav" && extension != ".ogg" && extension != ".mp3")
                 throw new ArgumentException("Only WAV, OGG, MP3 or extensionless audio paths are supported.");
-            for (string cursor = path; cursor != null; cursor = Path.GetDirectoryName(cursor))
+            for (var cursor = path; cursor != null; cursor = Path.GetDirectoryName(cursor))
                 if ((System.IO.File.Exists(cursor) || System.IO.Directory.Exists(cursor))
                     && (System.IO.File.GetAttributes(cursor) & FileAttributes.ReparsePoint) != 0)
                     throw new ArgumentException("Symbolic links and junctions are not supported in recording paths.");

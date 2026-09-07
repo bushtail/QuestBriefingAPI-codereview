@@ -101,7 +101,7 @@ namespace Manimal.QuestBriefingAPI
         {
             if (_active != null && _active != this) _active.Clear();
             _active = this;
-            bool changed = _questId != questId || _unlocked != unlocked || _recording != recording;
+            var changed = _questId != questId || _unlocked != unlocked || _recording != recording;
             _recording = recording;
             _questId = questId;
             _unlocked = unlocked;
@@ -121,8 +121,8 @@ namespace Manimal.QuestBriefingAPI
             _cueSource.volume = BriefingSettings.Volume.Value * 0.55f;
             if (!UseRadioCues) _cueSource.Stop();
             ApplyRadioFilter();
-            bool enabled = BriefingSettings.Enabled.Value;
-            bool autoPlay = BriefingSettings.AutoPlay.Value;
+            var enabled = BriefingSettings.Enabled.Value;
+            var autoPlay = BriefingSettings.AutoPlay.Value;
             if (_autoPlay && !autoPlay) StopPlayback(false);
             _autoPlay = autoPlay;
             if (_enabled != enabled)
@@ -218,8 +218,8 @@ namespace Manimal.QuestBriefingAPI
 
         private void ApplyRadioFilter(bool force = false)
         {
-            bool enabled = BriefingSettings.RadioFilter.Value && _recording?.RadioFilter != false;
-            float distortion = BriefingSettings.RadioDistortion.Value;
+            var enabled = BriefingSettings.RadioFilter.Value && _recording?.RadioFilter != false;
+            var distortion = BriefingSettings.RadioDistortion.Value;
             if (!force && _radioFiltered == enabled && _distortionLevel == distortion) return;
             _radioFiltered = enabled;
             _distortionLevel = distortion;
@@ -234,9 +234,9 @@ namespace Manimal.QuestBriefingAPI
             if (_bar == null || !_bar.gameObject.activeSelf) return;
             // Reserve space in the original layout instead of overlaying objectives.
             // Measuring at the current width also handles wrapping and resolution changes.
-            float width = _description.rectTransform.rect.width;
+            var width = _description.rectTransform.rect.width;
             if (width <= 1) return;
-            float height = _description.GetPreferredValues(_description.text, width, Mathf.Infinity).y;
+            var height = _description.GetPreferredValues(_description.text, width, Mathf.Infinity).y;
             _bar.anchoredPosition = new Vector2(0, -height - 14);
             if (Mathf.Abs(height - _lastTextHeight) < 0.5f) return;
             _lastTextHeight = height;
@@ -248,9 +248,9 @@ namespace Manimal.QuestBriefingAPI
             {
                 // Some quest prefabs use fixed rectangles rather than a layout group.
                 var rect = _description.rectTransform;
-                float oldHeight = rect.rect.height;
-                float baselineHeight = oldHeight - rect.sizeDelta.y + _originalSize.y;
-                float newHeight = Mathf.Max(baselineHeight, _space.preferredHeight);
+                var oldHeight = rect.rect.height;
+                var baselineHeight = oldHeight - rect.sizeDelta.y + _originalSize.y;
+                var newHeight = Mathf.Max(baselineHeight, _space.preferredHeight);
                 rect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, newHeight);
                 // Preserve the text's top edge even on prefabs with a centered pivot.
                 rect.anchoredPosition -= new Vector2(0, (newHeight - oldHeight) * (1 - rect.pivot.y));
@@ -263,7 +263,7 @@ namespace Manimal.QuestBriefingAPI
             if (_loading != null || !_selection.IsCurrent(_selection.Revision)) return;
             try
             {
-                string path = _recording?.ResolvePath();
+                var path = _recording?.ResolvePath();
                 if (path == null)
                 {
                     _status.text = "Recording not installed";
@@ -283,7 +283,7 @@ namespace Manimal.QuestBriefingAPI
         {
             // Ensure _loading is assigned even if opening the file fails immediately.
             yield return null;
-            AudioType type = path.EndsWith(".wav", StringComparison.OrdinalIgnoreCase) ? AudioType.WAV
+            var type = path.EndsWith(".wav", StringComparison.OrdinalIgnoreCase) ? AudioType.WAV
                 : path.EndsWith(".ogg", StringComparison.OrdinalIgnoreCase) ? AudioType.OGGVORBIS : AudioType.MPEG;
             UnityWebRequestAsyncOperation operation;
             try
@@ -365,7 +365,7 @@ namespace Manimal.QuestBriefingAPI
 
         private static AudioClip CreateCue(bool opening)
         {
-            float[] samples = RadioCueSamples.Create(opening);
+            var samples = RadioCueSamples.Create(opening);
             var clip = AudioClip.Create(opening ? "Radio connect" : "Radio disconnect",
                 samples.Length, 1, RadioCueSamples.SampleRate, false);
             clip.SetData(samples, 0);
@@ -387,7 +387,7 @@ namespace Manimal.QuestBriefingAPI
         {
             _selection.Stop(); // A pending decode may finish, but must not start playing.
             if (_source == null) return;
-            bool hadTransmission = _starting || _wasPlaying || _source.isPlaying;
+            var hadTransmission = _starting || _wasPlaying || _source.isPlaying;
             _paused = false;
             _starting = false;
             _source.Stop();

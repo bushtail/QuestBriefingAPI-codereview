@@ -28,11 +28,11 @@ namespace Manimal.QuestBriefingAPI
         {
             // Quest IDs are filenames, never arbitrary paths supplied by a quest template.
             if (questId == null || questId.Length != 24) return null;
-            foreach (char c in questId)
+            foreach (var c in questId)
                 if (!Uri.IsHexDigit(c)) return null;
-            foreach (string extension in new[] { ".wav", ".ogg", ".mp3" })
+            foreach (var extension in new[] { ".wav", ".ogg", ".mp3" })
             {
-                string path = Path.Combine(directory, questId + extension);
+                var path = Path.Combine(directory, questId + extension);
                 if (File.Exists(path)) return path;
             }
             return null;
@@ -40,7 +40,7 @@ namespace Manimal.QuestBriefingAPI
 
         public static string FormatTime(float seconds)
         {
-            int total = float.IsNaN(seconds) || float.IsInfinity(seconds) ? 0 : (int)Math.Max(0, seconds);
+            var total = float.IsNaN(seconds) || float.IsInfinity(seconds) ? 0 : (int)Math.Max(0, seconds);
             return $"{total / 60:00}:{total % 60:00}";
         }
     }

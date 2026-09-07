@@ -24,11 +24,11 @@ namespace Manimal.QuestBriefingAPI
             var context = ItemUiContext.Instance;
             if (context == null) return false;
             if (!(InputChildren?.GetValue(context) is IList children)) return true;
-            for (int i = 0; i < children.Count; i++)
+            for (var i = 0; i < children.Count; i++)
             {
                 var child = children[i] as Component;
                 if (child == null || !child.gameObject.activeInHierarchy) continue;
-                for (Type type = child.GetType(); type != null; type = type.BaseType)
+                for (var type = child.GetType(); type != null; type = type.BaseType)
                     if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Window<>))
                         return true;
             }
