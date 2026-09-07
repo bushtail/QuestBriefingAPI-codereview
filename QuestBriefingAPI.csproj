@@ -3,9 +3,6 @@
     <TargetFramework>netstandard2.1</TargetFramework>
     <AssemblyName>QuestBriefingAPI</AssemblyName>
     <RootNamespace>Manimal.QuestBriefingAPI</RootNamespace>
-    <Version>1.0.0</Version>
-    <Authors>Manimal</Authors>
-    <LangVersion>latest</LangVersion>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);1591</NoWarn>
@@ -28,5 +25,23 @@
   <Target Name="CheckGameReferences" BeforeTargets="ResolveReferences">
     <Error Condition="!Exists('$(SPTPath)/EscapeFromTarkov_Data/Managed/Assembly-CSharp.dll')"
            Text="Pass -p:SPTPath=PATH to your SPT 4.1 installation, or set SPT_PATH." />
+  </Target>
+  <Target Name="GeneratePluginVersion" BeforeTargets="CoreCompile">
+    <!-- This BepInEx release uses System.Version. Require numeric SemVer rather than silently stripping a prerelease suffix. -->
+    <Error Condition="!$([System.Text.RegularExpressions.Regex]::IsMatch('$(ModVersion)', '^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$'))"
+           Text="Set ModVersion in Directory.Build.props to MAJOR.MINOR.PATCH (for example 1.2.3). This BepInEx version requires numeric plugin versions; suffixes would create mismatched release metadata." />
+    <Error Condition="'$(Version)' != '$(ModVersion)'" Text="Version must match ModVersion. Change ModVersion in Directory.Build.props, or pass -p:ModVersion=1.2.3." />
+    <Error Condition="!$([System.Text.RegularExpressions.Regex]::IsMatch('$(ModGuid)', '^com\.[a-z0-9]+\.[a-z0-9]+$'))" Text="ModGuid must use com.username.modname." />
+    <Error Condition="!$([System.Text.RegularExpressions.Regex]::IsMatch('$(ModName)', '^[A-Za-z0-9]+-[A-Za-z0-9]+$')) Or '$(ModName)' != '$(ModUsername)-$(ModDisplayName)'"
+           Text="ModName must be Username-ModName, with letters/numbers and exactly one dash." />
+    <PropertyGroup>
+      <_PluginVersionFile>$(IntermediateOutputPath)PluginVersion.g.cs</_PluginVersionFile>
+    </PropertyGroup>
+    <WriteLinesToFile File="$(_PluginVersionFile)" Overwrite="true" WriteOnlyWhenDifferent="true"
+      Lines="namespace Manimal.QuestBriefingAPI { internal static class BuildInfo { internal const string Guid = &quot;$(ModGuid)&quot;%3B internal const string Name = &quot;$(ModName)&quot;%3B internal const string Version = &quot;$(ModVersion)&quot;%3B } }" />
+    <ItemGroup>
+      <Compile Include="$(_PluginVersionFile)" />
+      <FileWrites Include="$(_PluginVersionFile)" />
+    </ItemGroup>
   </Target>
 </Project>

@@ -4,10 +4,9 @@ param([string]$SPTPath = $env:SPT_PATH, [string]$OutputDirectory)
 $ErrorActionPreference = 'Stop'
 $root = $PSScriptRoot
 if ([string]::IsNullOrWhiteSpace($SPTPath)) {
-    if (Test-Path -LiteralPath 'D:\SPT41Dev\EscapeFromTarkov_Data\Managed\Assembly-CSharp.dll' -PathType Leaf) {
-        $SPTPath = 'D:\SPT41Dev'
-    } else {
-        throw "SPT installation not found. Run .\package-release.ps1 -SPTPath 'C:\path\to\SPT' or set the SPT_PATH environment variable."
+    $SPTPath = (& dotnet msbuild "$root\QuestBriefingAPI.csproj" -getProperty:SPTPath -nologo | Out-String).Trim()
+    if ($LASTEXITCODE -or [string]::IsNullOrWhiteSpace($SPTPath)) {
+        throw 'Set SPTPath in Directory.Build.props, set SPT_PATH, or pass -SPTPath.'
     }
 }
 if (-not (Test-Path -LiteralPath (Join-Path $SPTPath 'EscapeFromTarkov_Data\Managed\Assembly-CSharp.dll') -PathType Leaf)) {
@@ -22,8 +21,16 @@ if ($LASTEXITCODE) { throw 'Plugin build failed.' }
 & dotnet run --project "$root\tests\QuestBriefingAPI.Tests.csproj" -c Release "-p:SPTPath=$SPTPath"
 if ($LASTEXITCODE) { throw 'Briefing tests failed.' }
 & "$root\tests\Test-GameCompatibility.ps1" -SPTPath $SPTPath
-[xml]$project = Get-Content -LiteralPath "$root\QuestBriefingAPI.csproj" -Raw
-$version = [string]$project.Project.PropertyGroup.Version
+$metadataJson = & dotnet msbuild "$root\QuestBriefingAPI.csproj" -getProperty:ModVersion,ModGuid,ModName,RepositoryUrl -nologo
+if ($LASTEXITCODE) { throw 'Cannot read release metadata from Directory.Build.props.' }
+$metadata = ($metadataJson -join [Environment]::NewLine | ConvertFrom-Json).Properties
+$version = $metadata.ModVersion
+if ($version -notmatch '^[0-9]+\.[0-9]+\.[0-9]+$' -or $metadata.ModName -notmatch '^[A-Za-z0-9]+-[A-Za-z0-9]+$') {
+    throw 'Invalid release version/name in Directory.Build.props.'
+}
+if ($metadata.RepositoryUrl -notmatch '^https://[^\s]+$') { throw 'Set RepositoryUrl to the public source repository in Directory.Build.props.' }
+$releaseName = "$($metadata.ModName)-$version.zip"
+$sourceName = "$($metadata.ModName)-Source-$version.zip"
 $dist = if ([string]::IsNullOrWhiteSpace($OutputDirectory)) {
     Join-Path $root 'dist'
 } else { [IO.Path]::GetFullPath($OutputDirectory) }
@@ -65,18 +72,42 @@ $dll = "$root\bin\Release\netstandard2.1\QuestBriefingAPI.dll"
 $pluginFiles = @(
     @{ Path=$dll; Name='BepInEx/plugins/QuestBriefingAPI/QuestBriefingAPI.dll' },
     @{ Path="$root\bin\Release\netstandard2.1\QuestBriefingAPI.xml"; Name='BepInEx/plugins/QuestBriefingAPI/QuestBriefingAPI.xml' },
-    @{ Path="$root\README.md"; Name='QuestBriefingAPI-README.md' },
     @{ Path="$root\LICENSE"; Name='QuestBriefingAPI-LICENSE.txt' }
 )
+foreach ($document in @('README.md', 'VERSIONING.md')) {
+    if (Test-Path -LiteralPath "$root\$document" -PathType Leaf) {
+        $pluginFiles += @{ Path="$root\$document"; Name="QuestBriefingAPI-$document" }
+    }
+}
+$releaseInfoPath = Join-Path $dist 'RELEASE-INFO.txt'
+@"
+$($metadata.ModName) $version
+Forge GUID: $($metadata.ModGuid)
+Source: $($metadata.RepositoryUrl)
+
+Install: extract this ZIP into your SPT 4.1 installation root.
+The compiled DLL is in BepInEx/plugins/QuestBriefingAPI; no build is needed.
+Use F12 > $($metadata.ModName) to configure playback, volume, and radio effects.
+The config file is BepInEx/config/$($metadata.ModGuid).cfg.
+Briefing packs belong in their own directories under BepInEx/plugins.
+Copy examples/MyQuestBriefings, replace the IDs, add audio, then rename
+briefings.json.example to briefings.json. The bundled example is disabled.
+For C# integrations, use BepInDependency("$($metadata.ModGuid)", "$version").
+
+For a Forge upload, use the GUID/name/version above and link the source repository.
+Commit and push the exact source used for this binary before submitting it.
+In-game playback/layout still require testing; metadata checks do not verify them.
+"@ | Set-Content -LiteralPath $releaseInfoPath -Encoding utf8
+$pluginFiles += @{ Path=$releaseInfoPath; Name='QuestBriefingAPI-RELEASE-INFO.txt' }
 # The sample manifest uses .json.example so discovery ignores it until an author enables it.
 foreach ($file in (Get-ChildItem -LiteralPath "$root\examples" -File -Recurse)) {
     $relative = $file.FullName.Substring($root.Length + 1).Replace('\','/')
     $pluginFiles += @{ Path=$file.FullName; Name="BepInEx/plugins/QuestBriefingAPI/$relative" }
 }
-Write-VerifiedZip "QuestBriefingAPI-$version.zip" $pluginFiles
+Write-VerifiedZip $releaseName $pluginFiles
 $sourceFiles = @()
 foreach ($file in (Get-ChildItem -LiteralPath $root -File -Force)) {
-    if ($file.Extension -in '.ps1','.sln' -or $file.Name -in @('QuestBriefingAPI.csproj','Directory.Build.props','NuGet.Config','.gitignore','README.md','LICENSE')) {
+    if ($file.Extension -in '.ps1','.sln' -or $file.Name -in @('QuestBriefingAPI.csproj','Directory.Build.props','NuGet.Config','.gitignore','README.md','VERSIONING.md','LICENSE')) {
         $sourceFiles += @{ Path=$file.FullName; Name=$file.Name }
     }
 }
@@ -87,11 +118,11 @@ foreach ($directory in @('QuestBriefingAPIClient','examples','tests')) {
         $sourceFiles += @{ Path=$file.FullName; Name=$relative }
     }
 }
-Write-VerifiedZip "QuestBriefingAPI-Source-$version.zip" $sourceFiles
+Write-VerifiedZip $sourceName $sourceFiles
 # Retire the previous separate author kit only after the replacement archives are verified.
 $oldAuthorKit = Join-Path $dist "QuestBriefingAPI-AuthorKit-$version.zip"
 if (Test-Path -LiteralPath $oldAuthorKit -PathType Leaf) { Remove-Item -LiteralPath $oldAuthorKit }
-@("QuestBriefingAPI-$version.zip", "QuestBriefingAPI-Source-$version.zip") | ForEach-Object {
+@($releaseName, $sourceName) | ForEach-Object {
     '{0}  {1}' -f (Get-FileHash -LiteralPath (Join-Path $dist $_) -Algorithm SHA256).Hash, $_
 } | Set-Content -LiteralPath "$dist\SHA256SUMS.txt" -Encoding ascii
 Write-Host "Release with bundled examples and standalone source ZIPs verified in $dist"

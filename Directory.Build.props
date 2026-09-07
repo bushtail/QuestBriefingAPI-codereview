@@ -1,6 +1,23 @@
 <Project>
+  <!-- Change identity/version here; plugin metadata and release names are generated from these values. -->
   <PropertyGroup>
-    <!-- Keep this repository independent of any parent Directory.Build.props. -->
+    <ModVersion>1.0.0</ModVersion>
+    <ModGuid>com.manimal.questbriefingapi</ModGuid>
+    <ModUsername>Manimal</ModUsername>
+    <ModDisplayName>QuestBriefingAPI</ModDisplayName>
+    <ModName>$(ModUsername)-$(ModDisplayName)</ModName>
+    <RepositoryUrl>https://github.com/danauraborealis/QuestBriefingAPI</RepositoryUrl>
+
     <SPTPath Condition="'$(SPTPath)' == ''">$(SPT_PATH)</SPTPath>
+    <SPTPath Condition="'$(SPTPath)' == ''">D:\SPT41Dev</SPTPath>
+
+    <Version>$(ModVersion)</Version>
+    <Authors>$(ModUsername)</Authors>
+    <Product>$(ModName)</Product>
+    <Description>Recorded quest briefings for SPT.</Description>
+    <InformationalVersion>$(ModVersion)</InformationalVersion>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+    <LangVersion>latest</LangVersion>
+    <Deterministic>true</Deterministic>
   </PropertyGroup>
 </Project>

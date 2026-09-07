@@ -4,16 +4,19 @@ using BepInEx.Logging;
 
 namespace Manimal.QuestBriefingAPI
 {
-    [BepInPlugin(Id, "Quest Briefing API", Version)]
+    [BepInPlugin(Id, Name, Version)]
     public sealed class Plugin : BaseUnityPlugin
     {
-        public const string Id = "Manimal.QuestBriefingAPI";
-        public const string Version = "1.0.0";
+        public const string Id = BuildInfo.Guid;
+        public const string Name = BuildInfo.Name;
+        public const string Version = BuildInfo.Version;
+        public const string SemanticVersion = BuildInfo.Version;
         internal static ManualLogSource LogSource;
 
         private void Awake()
         {
             LogSource = Logger;
+            Logger.LogInfo($"Quest Briefing API {SemanticVersion}");
             BriefingSettings.Bind(Config);
             BriefingApi.Registry.Warning = message => Logger.LogWarning(message);
             int count = BriefingApi.Registry.LoadPacks(BepInEx.Paths.PluginPath);
