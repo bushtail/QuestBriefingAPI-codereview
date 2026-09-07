@@ -17,7 +17,7 @@ public class Plugin : BaseUnityPlugin
             "questbriefingexample",
             "0123456789abcdef01234567",
             assembly, 
-            "qbe.ogg",
+            "example.ogg",
             null,
             null
         );
